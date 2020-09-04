@@ -10,16 +10,17 @@ const mongoose = require('mongoose');
 const mongoURI = process.env.MONGO_URI;
 const db = mongoose.connection;
 const PORT = process.env.PORT || 3000;
+const cors = require('cors');
+const path = require('path');
 
 ///////////////////////////////////////////////////////////////////
 // MIDDLEWARE
 ///////////////////////////////////////////////////////////////////
 
-app.use(express.urlencoded({
-  extended: true
-}));
-app.use(express.static('public'));
+app.use(express.json());
 app.use(methodOverride('_method'));
+app.use(passport.initialize());
+app.use(cors());
 
 ///////////////////////////////////////////////////////////////////
 // MONGO CONNECTION
@@ -40,6 +41,10 @@ db.on('open', () => {
 ///////////////////////////////////////////////////////////////////
 // THE MEAT OF IT
 ///////////////////////////////////////////////////////////////////
+
+const userController = require('./controllers/users.js');
+
+app.use('/users', userController);
 
 
 app.listen(PORT, () => {

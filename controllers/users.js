@@ -17,7 +17,7 @@ router.post('/signup', (req, res) => {
 
     User.findOne({
       username: req.body.username
-    }, (user) => {
+    }, (error, user) => {
       console.log("=======findOne=======", user);
       if (!user) {
         console.log("Running create user");
@@ -27,11 +27,11 @@ router.post('/signup', (req, res) => {
           if (createdUser) {
             let payload = {
               id: createdUser.id,
-              email: createdUser.username,
+              username: createdUser.username,
               iat: Date.now()
             };
             console.log(payload);
-            let token = jwt.encode(payload.config.jwtSecret);
+            let token = jwt.encode(payload, config.jwtSecret);
             console.log(token);
             res.json({
               token: token
@@ -54,7 +54,9 @@ router.post('/signup', (req, res) => {
 router.post('/login', (req, res) => {
   if (req.body.username && req.body.password) {
     console.log(req.body.username);
-    User.findOne({ username: req.body.username}, (error, user) => {
+    User.findOne({
+      username: req.body.username
+    }, (error, user) => {
       if (error) console.log(error);
       if (user) {
         console.log('Found user. Checking Password...');
@@ -65,7 +67,7 @@ router.post('/login', (req, res) => {
             username: user.username,
             iat: Date.now()
           };
-          let token = jwt.encode(payload, config.jwtSecret);
+          let token = jwt.encode(payload, config.jwtSecret, {expiresIn: '1d'});
           console.log(token);
           res.json({
             token: token
@@ -82,6 +84,31 @@ router.post('/login', (req, res) => {
   } else {
     res.sendStatus(401);
   }
-})
+});
+
+router.put('/favorites', (req, res) => {
+  User.findById(req.body.id, (error, foundUser) => {
+    if (error) {
+      res.send(error);
+    } else if (foundUser.favorites.includes(req.body.newFav)) {
+      res.status(500).json({error: "favorite already exists"});
+    } else {
+      User.findByIdAndUpdate(req.body.id, {
+        $push: {
+          favorites: req.body.newFav
+        }
+      }, (error) => {
+        if (error) {
+          res.send(error);
+        }
+      });
+      User.findById(req.body.id, (error, foundUser) => {
+        res.status(200).json({
+          favorites: foundUser.favorites
+        });
+      });
+    }
+  });
+});
 
 module.exports = router;

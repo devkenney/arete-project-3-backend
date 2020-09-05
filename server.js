@@ -12,6 +12,7 @@ const db = mongoose.connection;
 const PORT = process.env.PORT || 3000;
 const cors = require('cors');
 const path = require('path');
+const passport = require('passport');
 
 ///////////////////////////////////////////////////////////////////
 // MIDDLEWARE

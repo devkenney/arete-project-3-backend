@@ -9,7 +9,7 @@ const app = express();
 const mongoose = require('mongoose');
 const mongoURI = process.env.MONGO_URI;
 const db = mongoose.connection;
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 const cors = require('cors');
 const path = require('path');
 const passport = require('passport');
@@ -47,6 +47,9 @@ const userController = require('./controllers/users.js');
 
 app.use('/users', userController);
 
+const marvelController = require('./controllers/marvel-api.js');
+
+app.use('/marvel', marvelController);
 
 app.listen(PORT, () => {
   console.log('Listening on port ' + PORT);

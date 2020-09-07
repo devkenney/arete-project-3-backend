@@ -67,7 +67,7 @@ router.post('/login', (req, res) => {
             username: user.username,
             iat: Date.now()
           };
-          let token = jwt.encode(payload, config.jwtSecret, {expiresIn: '1d'});
+          let token = jwt.encode(payload, config.jwtSecret);
           console.log(token);
           res.json({
             token: token

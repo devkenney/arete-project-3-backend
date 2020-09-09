@@ -91,7 +91,9 @@ router.put('/favorites', (req, res) => {
     if (error) {
       res.send(error);
     } else if (foundUser.favorites.includes(req.body.newFav)) {
-      res.status(500).json({error: "favorite already exists"});
+      res.status(500).json({
+        error: "favorite already exists"
+      });
     } else {
       User.findByIdAndUpdate(req.body.id, {
         $push: {
@@ -110,5 +112,16 @@ router.put('/favorites', (req, res) => {
     }
   });
 });
+
+router.get('/favorites', (req, res) => {
+  const decodedUser = jwt.decode(req.body.token, config.jwtSecret);
+  User.findById(decodedUser.id, (error, foundUser) => {
+    if (error) {
+      res.status(500);
+    } else {
+      res.send(foundUser.favorites);
+    }
+  })
+})
 
 module.exports = router;

@@ -32,7 +32,7 @@ router.get('/:type', async (req, res) => {
 
 router.get('/:type/:id', async (req, res) => {
   const timestamp = Date.now();
-  let apiKeyHash = (timestamp + process.env.PRIVATE_KEY + '14c064fd7330d35f8c084637daeb2aa8')
+  let apiKeyHash = (timestamp + process.env.PRIVATE_KEY + process.env.PUBLIC_KEY);
   apiKeyHash = crypto.createHash('md5').update(apiKeyHash).digest("hex");
   console.log(apiKeyHash);
   const returnedData = await getDataById(req.params.type, req.params.id, timestamp, apiKeyHash);

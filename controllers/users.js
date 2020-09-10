@@ -87,7 +87,8 @@ router.post('/login', (req, res) => {
 });
 
 router.put('/favorites', (req, res) => {
-  User.findById(req.body.id, (error, foundUser) => {
+  const decodedUser = jwt.decode(req.body.token, config.jwtSecret);
+  User.findById(decodedUser.id, (error, foundUser) => {
     if (error) {
       res.send(error);
     } else if (foundUser.favorites.includes(req.body.newFav)) {
@@ -121,7 +122,7 @@ router.get('/favorites', (req, res) => {
     } else {
       res.send(foundUser.favorites);
     }
-  })
-})
+  });
+});
 
 module.exports = router;

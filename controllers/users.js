@@ -88,7 +88,9 @@ router.post('/login', (req, res) => {
 
 router.put('/favorites', (req, res) => {
   const decodedUser = jwt.decode(req.body.token, config.jwtSecret);
+  console.log(decodedUser);
   User.findById(decodedUser.id, (error, foundUser) => {
+    console.log(foundUser)
     if (error) {
       res.send(error);
     } else if (foundUser.favorites.includes(req.body.newFav)) {
@@ -96,7 +98,7 @@ router.put('/favorites', (req, res) => {
         error: "favorite already exists"
       });
     } else {
-      User.findByIdAndUpdate(req.body.id, {
+      User.findByIdAndUpdate(foundUser.id, {
         $push: {
           favorites: req.body.newFav
         }
@@ -105,7 +107,7 @@ router.put('/favorites', (req, res) => {
           res.send(error);
         }
       });
-      User.findById(req.body.id, (error, foundUser) => {
+      User.findById(foundUser.id, (error, foundUser) => {
         res.status(200).json({
           favorites: foundUser.favorites
         });

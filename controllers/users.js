@@ -117,11 +117,13 @@ router.put('/favorites', (req, res) => {
 });
 
 router.get('/favorites', (req, res) => {
-  const decodedUser = jwt.decode(req.body.token, config.jwtSecret);
+  const decodedUser = jwt.decode(req.query.token, config.jwtSecret);
+  console.log(decodedUser);
   User.findById(decodedUser.id, (error, foundUser) => {
     if (error) {
       res.status(500);
     } else {
+      console.log(foundUser.favorites);
       res.send(foundUser.favorites);
     }
   });

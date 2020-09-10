@@ -125,4 +125,17 @@ router.get('/favorites', (req, res) => {
   });
 });
 
+router.delete('/favorites', (req, res) => {
+  const decodedUser = jwt.decode(req.body.token, config.jwtSecret);
+  User.findById(decodedUser.id, (error, foundUser) => {
+    if (error) {
+      res.status(500);
+    } else {
+      const index = foundUser.favorites.indexOf(req.body.favToDelete);
+      foundUser.favorites.splice(index, 1);
+      User.findOneAndUpdate(foundUser, {favorites: foundUser.favorites});
+    }
+  });
+});
+
 module.exports = router;

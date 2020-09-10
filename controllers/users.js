@@ -87,13 +87,18 @@ router.post('/login', (req, res) => {
 });
 
 router.put('/favorites', (req, res) => {
-  User.findById(req.body.id, (error, foundUser) => {
+  const decodedUser = jwt.decode(req.body.token, config.jwtSecret);
+  console.log(decodedUser);
+  User.findById(decodedUser.id, (error, foundUser) => {
+    console.log(foundUser)
     if (error) {
       res.send(error);
     } else if (foundUser.favorites.includes(req.body.newFav)) {
-      res.status(500).json({error: "favorite already exists"});
+      res.status(500).json({
+        error: "favorite already exists"
+      });
     } else {
-      User.findByIdAndUpdate(req.body.id, {
+      User.findByIdAndUpdate(foundUser.id, {
         $push: {
           favorites: req.body.newFav
         }
@@ -102,11 +107,37 @@ router.put('/favorites', (req, res) => {
           res.send(error);
         }
       });
-      User.findById(req.body.id, (error, foundUser) => {
+      User.findById(foundUser.id, (error, foundUser) => {
         res.status(200).json({
           favorites: foundUser.favorites
         });
       });
+    }
+  });
+});
+
+router.get('/favorites', (req, res) => {
+  const decodedUser = jwt.decode(req.query.token, config.jwtSecret);
+  console.log(decodedUser);
+  User.findById(decodedUser.id, (error, foundUser) => {
+    if (error) {
+      res.status(500);
+    } else {
+      console.log(foundUser.favorites);
+      res.send(foundUser.favorites);
+    }
+  });
+});
+
+router.delete('/favorites', (req, res) => {
+  const decodedUser = jwt.decode(req.body.token, config.jwtSecret);
+  User.findById(decodedUser.id, (error, foundUser) => {
+    if (error) {
+      res.status(500);
+    } else {
+      const index = foundUser.favorites.indexOf(req.body.favToDelete);
+      foundUser.favorites.splice(index, 1);
+      User.findOneAndUpdate(foundUser, {favorites: foundUser.favorites});
     }
   });
 });
